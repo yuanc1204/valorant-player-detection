@@ -1,0 +1,10 @@
+# Dataset config (YOLO format)
+# Expected structure (dataset NOT included in this repo):
+#   datasets/
+#     images/train, images/val
+#     labels/train, labels/val   (YOLO txt, one line per box: cls cx cy w h)
+path: datasets
+train: images/train
+val: images/val
+nc: 3
+names: ['head', 'body', 'teammate']

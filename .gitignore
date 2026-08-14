@@ -1,0 +1,14 @@
+# Training artifacts
+runs/
+
+# Datasets are NOT part of this repo
+datasets/
+new_data/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environments
+.venv/
+venv*/
