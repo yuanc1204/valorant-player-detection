@@ -1,66 +1,63 @@
-# FPS Game Player Detection with YOLO
+# FPS 游戏人物检测 (YOLO)
 
-Computer-vision research project: detect players in an FPS game (Valorant) using YOLO.
-Pipeline: center-crop game screenshots to 640×640 → train a YOLO model → run inference.
+**中文 | [English](README_EN.md)**
 
-> ⚠️ **For research and educational purposes only.** Use offline / on your own recordings.
-> Not affiliated with or endorsed by Riot Games.
-> The training set covers early-2026 match screenshots only — **newer maps and newly
-> released agents are not included**, so detection quality may drop on those.
+计算机视觉研究项目：使用 YOLO 检测 FPS 游戏（瓦罗兰特）中的人物。流程：游戏截图中心裁剪 640×640 → YOLO 训练 → 推理检测。
 
-## Detection Results (validation set)
+> ⚠️ **仅供研究与教育用途**，请仅离线使用自己的录像素材。本项目与 Riot Games 无任何关联。
+> 训练集为 2026 年初的对局截图，**较新的地图/新角色未加入训练集**，在这些新内容上识别效果可能下降；如需适配，请补充新截图标注后继续微调。
 
-| head | body | teammate |
+## 识别效果（验证集实测）
+
+| head（头部） | body（身体） | teammate（队友） |
 |:---:|:---:|:---:|
 | <img src="docs/demo/demo_head.jpg" width="300"> | <img src="docs/demo/demo_body.jpg" width="300"> | <img src="docs/demo/demo_teammate.jpg" width="300"> |
-| conf 0.92 | conf 0.94 | conf 0.92 |
+| 置信度 0.92 | 置信度 0.94 | 置信度 0.92 |
 
-## Training Results
+## 训练结果
 
-| Training curves (loss / mAP) | PR curve |
+| 训练曲线（loss / mAP） | PR 曲线 |
 |:---:|:---:|
 | <img src="docs/curves_training.png" width="400"> | <img src="docs/curves_pr.png" width="400"> |
 
-**Confusion matrix (normalized)**
+**混淆矩阵（归一化）**
 
 <img src="docs/curves_confusion.png" width="420">
 
-Validation metrics: **mAP@0.5 = 0.976, mAP@0.5:0.95 = 0.690** (3 classes: head/body/teammate).
+验证集指标：**mAP@0.5 = 0.976，mAP@0.5:0.95 = 0.690**（head/body/teammate 三类）。
 
-## Dataset
+## 数据集
 
-The training dataset (labeled game screenshots, ~1200 images) is **not included** in this
-repository. To reproduce, collect screenshots and label them (e.g. with LabelImg), then
-organize as:
+本仓库**不包含**训练数据集（约 1200 张带标注截图）。如需复现，请自行采集截图并标注（如 LabelImg），按以下结构组织：
 
 ```
 datasets/
   images/train/  images/val/
-  labels/train/  labels/val/   # YOLO txt: cls cx cy w h (normalized)
+  labels/train/  labels/val/   # YOLO txt 格式: cls cx cy w h（归一化坐标）
 ```
 
-Labels: `head`(0) / `body`(1) / `teammate`(2).
+类别：`head`(0) / `body`(1) / `teammate`(2)
 
-## Pipeline
+## 流程
 
-1. **Crop** `crop_center.py` — center-crop screenshots to 640×640 (avoids squashing players when resizing the full frame)
+1. **裁剪** `crop_center.py` — 截图中心裁剪 640×640（避免整图缩放导致人物压扁）
    ```
-   python crop_center.py -i <screenshot_dir> -o new_data/images -s 640
+   python crop_center.py -i 截图文件夹 -o new_data/images -s 640
    ```
-2. **Extract frames** `val_video.py` — sample frames from a match recording with interactive review
+2. **视频抽帧** `val_video.py` — 从对局录像抽帧并交互式筛选
    ```
-   python val_video.py -v <video.mp4> -m runs/train/weights/best.engine -o new_data/images
+   python val_video.py -v 录像.mp4 -m runs/train/weights/best.engine -o new_data/images
    ```
-3. **Train** `train.py` — YOLO11n base, config in `data.yaml`
-4. **Export** `export.py` — export to TensorRT engine (FP16, faster inference)
-5. **Inference** `predict.py` — batch inference, results saved to `runs/predict/`
+3. **训练** `train.py` — 基于 YOLO11n，配置见 `data.yaml`
+4. **导出** `export.py` — 导出 TensorRT engine（半精度，推理更快）
+5. **推理** `predict.py` — 批量测试，结果存 `runs/predict/`
 
-## Requirements
+## 环境要求
 
 - Python 3.10+
 - `pip install ultralytics opencv-python`
-- CUDA-enabled torch recommended (`device=0`); fall back to `device='cpu'` otherwise
+- 推荐 CUDA 版 torch（`device=0`）；无 GPU 时改用 `device='cpu'`
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Ultralytics (used as a dependency) is AGPL-3.0.
+MIT — 见 [LICENSE](LICENSE)。依赖的 Ultralytics 为 AGPL-3.0。
