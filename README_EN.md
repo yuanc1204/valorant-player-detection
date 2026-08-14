@@ -29,6 +29,22 @@ Pipeline: center-crop game screenshots to 640×640 → train a YOLO model → ru
 
 Validation metrics: **mAP@0.5 = 0.976, mAP@0.5:0.95 = 0.690** (3 classes: head/body/teammate).
 
+## Quick Start
+
+A trained model `models/best.pt` (YOLO11n fine-tuned, 3 classes: head/body/teammate) is included — no training needed:
+
+```python
+from ultralytics import YOLO
+
+model = YOLO('models/best.pt')
+results = model.predict('screenshot.png', conf=0.25, imgsz=640)
+print(results[0].boxes)  # xyxy, conf, cls
+```
+
+The model was trained on **640×640 center crops**; running it directly on full-screen
+screenshots loses accuracy due to resizing — crop with `crop_center.py` first (or use
+`imgsz=640` during inference).
+
 ## Dataset
 
 The training dataset (labeled game screenshots, ~1200 images) is **not included** in this
@@ -51,7 +67,7 @@ Labels: `head`(0) / `body`(1) / `teammate`(2).
    ```
 2. **Extract frames** `val_video.py` — sample frames from a match recording with interactive review
    ```
-   python val_video.py -v <video.mp4> -m runs/train/weights/best.engine -o new_data/images
+   python val_video.py -v <video.mp4> -m models/best.pt -o new_data/images
    ```
 3. **Train** `train.py` — YOLO11n base, config in `data.yaml`
 4. **Export** `export.py` — export to TensorRT engine (FP16, faster inference)
@@ -65,4 +81,6 @@ Labels: `head`(0) / `body`(1) / `teammate`(2).
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Ultralytics (used as a dependency) is AGPL-3.0.
+Code: MIT — see [LICENSE](LICENSE).
+The model weights `models/best.pt` are fine-tuned from an AGPL-3.0 Ultralytics base;
+redistribution must comply with AGPL-3.0. The Ultralytics dependency is also AGPL-3.0.

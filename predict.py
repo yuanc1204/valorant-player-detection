@@ -3,7 +3,7 @@ import os
 
 if __name__ == '__main__':
     # Path to your trained weights
-    model_path = r'runs/train/weights/best.pt'
+    model_path = r'models/best.pt'
 
     if not os.path.exists(model_path):
         print(f'Error: model not found at {model_path}. Run train.py first.')

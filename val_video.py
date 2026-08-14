@@ -140,8 +140,8 @@ def main(video_path, model_path, save_dir, crop_size, conf_val, jump_seconds, DE
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract + center-crop frames from a match recording')
     parser.add_argument('-v', '--video', required=True, help='path to the video file (required)')
-    parser.add_argument('-m', '--model', default=r'runs/train/weights/best.engine',
-                        help='model path (default: runs/train/weights/best.engine)')
+    parser.add_argument('-m', '--model', default=r'models/best.pt',
+                        help='model path (default: models/best.pt)')
     parser.add_argument('-o', '--save-dir', default=r'new_data\images', help='output folder (default: new_data/images)')
     parser.add_argument('--crop-size', type=int, default=640, help='center-crop size (default: 640)')
     parser.add_argument('--conf', type=float, default=0.6, help='detection confidence threshold (default: 0.6)')

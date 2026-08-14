@@ -26,6 +26,20 @@
 
 验证集指标：**mAP@0.5 = 0.976，mAP@0.5:0.95 = 0.690**（head/body/teammate 三类）。
 
+## 快速上手
+
+仓库自带训练好的模型 `models/best.pt`（YOLO11n 微调，三类：head/body/teammate），无需训练即可直接使用：
+
+```python
+from ultralytics import YOLO
+
+model = YOLO('models/best.pt')
+results = model.predict('截图.png', conf=0.25, imgsz=640)
+print(results[0].boxes)  # xyxy, conf, cls
+```
+
+模型按 **640×640 中心裁剪图**训练，对整屏截图直接推理会因缩放而精度下降——建议先用 `crop_center.py` 裁剪到 640×640 再推理（或推理时 `imgsz=640`）。
+
 ## 数据集
 
 本仓库**不包含**训练数据集（约 1200 张带标注截图）。如需复现，请自行采集截图并标注（如 LabelImg），按以下结构组织：
@@ -46,7 +60,7 @@ datasets/
    ```
 2. **视频抽帧** `val_video.py` — 从对局录像抽帧并交互式筛选
    ```
-   python val_video.py -v 录像.mp4 -m runs/train/weights/best.engine -o new_data/images
+   python val_video.py -v 录像.mp4 -m models/best.pt -o new_data/images
    ```
 3. **训练** `train.py` — 基于 YOLO11n，配置见 `data.yaml`
 4. **导出** `export.py` — 导出 TensorRT engine（半精度，推理更快）
@@ -60,4 +74,5 @@ datasets/
 
 ## License
 
-MIT — 见 [LICENSE](LICENSE)。依赖的 Ultralytics 为 AGPL-3.0。
+代码：MIT — 见 [LICENSE](LICENSE)。
+模型权重 `models/best.pt` 基于 AGPL-3.0 的 Ultralytics 底座微调，分发/再发布请遵守 AGPL-3.0；依赖的 Ultralytics 亦为 AGPL-3.0。
